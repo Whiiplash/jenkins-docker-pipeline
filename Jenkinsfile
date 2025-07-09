@@ -21,7 +21,14 @@ pipeline {
         stage('Correr contenedor') {
             steps {
                 script {
+                    // Elimina si ya existe un contenedor con ese nombre
+                    sh 'docker stop flask-container || true'
+                    sh 'docker rm flask-container || true'
+
+                    // Corre el contenedor
                     sh 'docker run -d -p 5000:5000 --name flask-container $IMAGE_NAME'
+
+                    // Espera y muestra estado
                     sleep(time: 5, unit: "SECONDS")
                     sh 'docker ps | grep flask-container || true'
                 }
