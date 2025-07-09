@@ -25,6 +25,19 @@ pipeline {
             }
         }
 
+        // 	Task 4c: Etiquetar imagen con SHA del commit
+        stage('Taggear imagen con SHA') {
+            steps {
+                script {
+                    sh '''
+                        COMMIT_SHA=$(git rev-parse --short HEAD)
+                        echo "Tag del commit: $COMMIT_SHA"
+                        docker tag $IMAGE_NAME whiiplash/$IMAGE_NAME:$COMMIT_SHA
+                    '''
+                }
+            }
+        }
+
         stage('Finalizar contenedor') {
             steps {
                 sh '''
