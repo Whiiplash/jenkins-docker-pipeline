@@ -1,14 +1,14 @@
 pipeline {
+    agent any
+
     environment {
         IMAGE_NAME = "flask-app"
     }
 
-    agent any
-
     stages {
         stage('Clonar repositorio') {
             steps {
-                git branch: 'main', url: 'https://github.com/Whiiplash/jenkins-docker-pipeline.git'
+                git 'https://github.com/Whiiplash/jenkins-docker-pipeline.git'
             }
         }
 
@@ -21,19 +21,22 @@ pipeline {
         stage('Correr contenedor') {
             steps {
                 script {
-                    sh 'docker run -d -p 5001:5000 --name flask-container $IMAGE_NAME'
-                    sleep(time: 5, unit: "SECONDS")
-                    sh 'docker ps | grep flask-container || true'
+                    sh '''
+                        docker rm -f flask-container || true
+                        docker run -d -p 5001:5000 --name flask-container $IMAGE_NAME
+                        sleep 5
+                        docker ps | grep flask-container
+                    '''
                 }
             }
         }
 
         stage('Finalizar contenedor') {
             steps {
-                script {
-                    sh 'docker stop flask-container || true'
-                    sh 'docker rm flask-container || true'
-                }
+                sh '''
+                    docker stop flask-container || true
+                    docker rm flask-container || true
+                '''
             }
         }
     }
