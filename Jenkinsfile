@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "flask-app"
+        IMAGE_NAME = 'whiiplash/flask-app'
     }
 
     stages {
         stage('Construir imagen Docker') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                sh 'docker build -t flask-app .'
             }
         }
 
@@ -17,7 +17,7 @@ pipeline {
                 script {
                     sh '''
                         docker rm -f flask-container || true
-                        docker run -d -p 5001:5000 --name flask-container $IMAGE_NAME
+                        docker run -d -p 5001:5000 --name flask-container flask-app
                         sleep 5
                         docker ps | grep flask-container || true
                     '''
@@ -25,15 +25,29 @@ pipeline {
             }
         }
 
-        // 	Task 4c: Etiquetar imagen con SHA del commit
         stage('Taggear imagen con SHA') {
             steps {
                 script {
                     sh '''
                         COMMIT_SHA=$(git rev-parse --short HEAD)
                         echo "Tag del commit: $COMMIT_SHA"
-                        docker tag $IMAGE_NAME whiiplash/$IMAGE_NAME:$COMMIT_SHA
+                        docker tag flask-app ${IMAGE_NAME}:$COMMIT_SHA
                     '''
+                }
+            }
+        }
+
+        stage('Push a Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    script {
+                        sh '''
+                            COMMIT_SHA=$(git rev-parse --short HEAD)
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                            docker push ${IMAGE_NAME}:$COMMIT_SHA
+                            docker logout
+                        '''
+                    }
                 }
             }
         }
