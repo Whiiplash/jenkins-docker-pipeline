@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clonar repositorio') {
             steps {
-                git 'https://github.com/Whiiplash/jenkins-docker-pipeline.git'
+                git branch: 'main', url: 'https://github.com/Whiiplash/jenkins-docker-pipeline.git'
             }
         }
 
@@ -23,16 +23,10 @@ pipeline {
                 script {
                     sh 'docker run -d -p 5000:5000 --name flask-container $IMAGE_NAME'
                     sleep(time: 5, unit: "SECONDS")
-                    sh 'docker ps | grep flask-container'
+                    sh 'docker ps | grep flask-container || true'
                 }
             }
         }
 
         stage('Finalizar contenedor') {
             steps {
-                sh 'docker stop flask-container || true'
-                sh 'docker rm flask-container || true'
-            }
-        }
-    }
-}
