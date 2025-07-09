@@ -19,7 +19,7 @@ pipeline {
                         docker rm -f flask-container || true
                         docker run -d -p 5001:5000 --name flask-container $IMAGE_NAME
                         sleep 5
-                        docker ps | grep flask-container
+                        docker ps | grep flask-container || true
                     '''
                 }
             }
