@@ -39,7 +39,7 @@ pipeline {
 
         stage('Push a Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     script {
                         sh '''
                             COMMIT_SHA=$(git rev-parse --short HEAD)
@@ -54,10 +54,12 @@ pipeline {
 
         stage('Finalizar contenedor') {
             steps {
-                sh '''
-                    docker stop flask-container || true
-                    docker rm flask-container || true
-                '''
+                script {
+                    sh '''
+                        docker stop flask-container || true
+                        docker rm flask-container || true
+                    '''
+                }
             }
         }
     }
