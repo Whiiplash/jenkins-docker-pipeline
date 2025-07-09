@@ -30,3 +30,9 @@ pipeline {
 
         stage('Finalizar contenedor') {
             steps {
+                sh 'docker stop flask-container || true'
+                sh 'docker rm flask-container || true'
+            }
+        }
+    }
+}
