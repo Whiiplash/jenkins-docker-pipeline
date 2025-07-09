@@ -6,12 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Clonar repositorio') {
-            steps {
-                git 'https://github.com/Whiiplash/jenkins-docker-pipeline.git'
-            }
-        }
-
         stage('Construir imagen Docker') {
             steps {
                 sh 'docker build -t $IMAGE_NAME .'
