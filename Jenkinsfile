@@ -2,21 +2,26 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Clonar repositorio') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/Whiiplash/jenkins-docker-pipeline.git'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Construir imagen Docker') {
             steps {
                 script {
-                    dockerImage = docker.build("whiiplash/flask-docker-pipeline")
+                    dockerImage = docker.build("flask-app")
                 }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Correr contenedor') {
             steps {
                 script {
-                    dockerImage.run("-d
+                    dockerImage.run("-d -p 5000:5000 flask-app")
+                }
+            }
+        }
+    }
+}
